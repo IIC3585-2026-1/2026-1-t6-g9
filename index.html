@@ -13,36 +13,24 @@
 
     <h2>Temperatura</h2>
 
-    <mi-slider
-        min="0"
-        max="100"
-        value="50"
-        step="5"
-        style="max-width:300px;"
-    >
-
+    <mi-slider min="0" max="100" value="50" step="5" style="max-width:300px;">
         <mi-slider-label>0°C</mi-slider-label>
-
-        <mi-slider-label position="25">
-            25°C
-        </mi-slider-label>
-
-        <mi-slider-label position="50">
-            50°C
-        </mi-slider-label>
-
-        <mi-slider-label position="75">
-            75°C
-        </mi-slider-label>
-
-        <mi-slider-label position="100">
-            100°C
-        </mi-slider-label>
-
+        <mi-slider-label position="25">25°C</mi-slider-label>
+        <mi-slider-label position="50">50°C</mi-slider-label>
+        <mi-slider-label position="75">75°C</mi-slider-label>
+        <mi-slider-label position="100">100°C</mi-slider-label>
     </mi-slider>
 
     <script src="./components/mi-slider/mi-slider-label.js"></script>
     <script src="./components/mi-slider/mi-slider.js"></script>
+
+    <mi-switch>
+        <span slot="checked-message">On</span>
+        <span slot="unchecked-message">Off</span>
+        <label>Captions:</label>
+    </mi-switch>
+
+    <script src="./components/mi-switch.js"></script>
 
 
 </body>
