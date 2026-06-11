@@ -89,14 +89,55 @@ class CampoNumerico extends HTMLElement {
         const inc = this.shadowRoot.querySelector("#inc");
         const dec = this.shadowRoot.querySelector("#dec");
 
-        input.value = this.getAttribute("value") || 0;
+        const noNegativos = this.hasAttribute("no-negativos");
 
+        // Valor inicial
+        const valorInicial = this.getAttribute("value");
+
+        if (valorInicial !== null) {
+            input.value = valorInicial;
+        } else {
+            input.value = "0";
+        }
+
+        // Si no se permiten negativos, corregimos el valor inicial
+        if (noNegativos) {
+            input.min = "0";
+
+            if (Number(input.value) < 0) {
+                input.value = "0";
+            }
+        }
+
+        // Incrementar
         inc.addEventListener("click", () => {
-            input.value = Number(input.value) + 1;
+            input.value = Number(input.value || 0) + 1;
         });
 
+        // Decrementar
         dec.addEventListener("click", () => {
-            input.value = Number(input.value) - 1;
+
+            const valorActual = Number(input.value || 0);
+
+            if (noNegativos && valorActual <= 0) {
+                return;
+            }
+
+            input.value = valorActual - 1;
+        });
+
+        // Validación manual
+        input.addEventListener("input", () => {
+
+            if (!noNegativos) {
+                return;
+            }
+
+            const valor = Number(input.value);
+
+            if (!isNaN(valor) && valor < 0) {
+                input.value = "0";
+            }
         });
     }
 }
