@@ -1,15 +1,54 @@
+const sliderLabelTemplate = document.createElement("template");
+
+sliderLabelTemplate.innerHTML = `
+    <style>
+        :host {
+            position: absolute;
+            left: var(--slider-label-position, 0%);
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+    </style>
+
+    <slot></slot>
+`;
+
 class MiSliderLabel extends HTMLElement {
 
+    static get observedAttributes() {
+        return ["position"];
+    }
+
+    constructor() {
+        super();
+
+        this.attachShadow({ mode: "open" });
+
+        this.shadowRoot.appendChild(
+            sliderLabelTemplate.content.cloneNode(true)
+        );
+    }
+
     connectedCallback() {
+        this.updatePosition();
+    }
 
+    attributeChangedCallback() {
+        this.updatePosition();
+    }
+
+    updatePosition() {
         const position =
-            this.getAttribute("position") || "0";
+            Number(this.getAttribute("position") || "0");
 
-        this.style.position = "absolute";
-        this.style.left = position + "%";
-        this.style.transform = "translateX(-50%)";
-        this.style.fontSize = "12px";
-        this.style.whiteSpace = "nowrap";
+        const validPosition =
+            Number.isFinite(position) ? position : 0;
+
+        this.style.setProperty(
+            "--slider-label-position",
+            `${validPosition}%`
+        );
     }
 }
 
