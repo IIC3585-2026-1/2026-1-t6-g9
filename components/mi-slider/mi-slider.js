@@ -2,26 +2,26 @@ const sliderTemplate = document.createElement("template");
 
 sliderTemplate.innerHTML = `
     <style>
-        :host{
-            display:block;
-            width:100%;
+        :host {
+            display: block;
+            width: 100%;
         }
 
-        .container{
-            position:relative;
-            width:100%;
+        .container {
+            position: relative;
+            width: 100%;
         }
 
-        input[type="range"]{
-            width:100%;
-            margin:0;
+        input[type="range"] {
+            width: 100%;
+            margin: 0;
         }
 
-        .labels{
-            position:relative;
-            width:100%;
-            height:30px;
-            margin-top:8px;
+        .labels {
+            position: relative;
+            width: 100%;
+            height: 30px;
+            margin-top: 8px;
         }
     </style>
 
@@ -36,6 +36,10 @@ sliderTemplate.innerHTML = `
 
 class MiSlider extends HTMLElement {
 
+    static get observedAttributes() {
+        return ["min", "max", "value", "step"];
+    }
+
     constructor() {
         super();
 
@@ -44,24 +48,62 @@ class MiSlider extends HTMLElement {
         this.shadowRoot.appendChild(
             sliderTemplate.content.cloneNode(true)
         );
+
+        this.slider =
+            this.shadowRoot.querySelector("input");
+
+        this.slider.addEventListener("input", () => {
+            this.reflectValue();
+            this.emitValueEvent("input");
+        });
+
+        this.slider.addEventListener("change", () => {
+            this.reflectValue();
+            this.emitValueEvent("change");
+        });
     }
 
     connectedCallback() {
+        this.syncAttributes();
+    }
 
-        const slider =
-            this.shadowRoot.querySelector("input");
+    attributeChangedCallback() {
+        this.syncAttributes();
+    }
 
-        slider.min =
-            this.getAttribute("min") || "0";
+    get value() {
+        return Number(this.slider.value);
+    }
 
-        slider.max =
-            this.getAttribute("max") || "100";
+    set value(value) {
+        this.setAttribute("value", value);
+    }
 
-        slider.value =
-            this.getAttribute("value") || "0";
+    syncAttributes() {
+        if (!this.slider) {
+            return;
+        }
 
-        slider.step =
-            this.getAttribute("step") || "1";
+        this.slider.min = this.getAttribute("min") || "0";
+        this.slider.max = this.getAttribute("max") || "100";
+        this.slider.value = this.getAttribute("value") || "0";
+        this.slider.step = this.getAttribute("step") || "1";
+    }
+
+    reflectValue() {
+        this.setAttribute("value", this.slider.value);
+    }
+
+    emitValueEvent(type) {
+        this.dispatchEvent(
+            new CustomEvent(type, {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    value: this.value
+                }
+            })
+        );
     }
 }
 
