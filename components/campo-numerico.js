@@ -25,14 +25,12 @@ template.innerHTML = `
             font-size: 14px;
         }
 
-        /* Oculta flechas nativas en Chrome, Edge y Safari */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        /* Oculta flechas nativas en Firefox */
         input[type="number"] {
             appearance: textfield;
         }
@@ -65,8 +63,8 @@ template.innerHTML = `
         <input type="number">
 
         <div class="buttons">
-            <button id="inc">+</button>
-            <button id="dec">−</button>
+            <button id="inc" type="button" aria-label="Incrementar">+</button>
+            <button id="dec" type="button" aria-label="Decrementar">−</button>
         </div>
     </div>
 `;
@@ -81,64 +79,102 @@ class CampoNumerico extends HTMLElement {
         this.shadowRoot.appendChild(
             template.content.cloneNode(true)
         );
+
+        this.input = this.shadowRoot.querySelector("input");
+        this.incrementButton =
+            this.shadowRoot.querySelector("#inc");
+        this.decrementButton =
+            this.shadowRoot.querySelector("#dec");
+        this.lastNonZeroValue = 1;
+
+        this.incrementButton.addEventListener(
+            "click",
+            () => this.changeBy(1)
+        );
+
+        this.decrementButton.addEventListener(
+            "click",
+            () => this.changeBy(-1)
+        );
+
+        this.input.addEventListener(
+            "keydown",
+            (event) => this.handleKeydown(event)
+        );
+
+        this.input.addEventListener(
+            "input",
+            () => this.validateInput()
+        );
     }
 
     connectedCallback() {
+        const initialValue =
+            Number(this.getAttribute("value") ?? 0);
 
-        const input = this.shadowRoot.querySelector("input");
-        const inc = this.shadowRoot.querySelector("#inc");
-        const dec = this.shadowRoot.querySelector("#dec");
+        this.setValue(initialValue);
+    }
 
-        const noNegativos = this.hasAttribute("no-negativos");
+    get noNegativos() {
+        return this.hasAttribute("no-negativos");
+    }
 
-        // Valor inicial
-        const valorInicial = this.getAttribute("value");
+    get sinCero() {
+        return this.hasAttribute("sin-cero");
+    }
 
-        if (valorInicial !== null) {
-            input.value = valorInicial;
-        } else {
-            input.value = "0";
+    changeBy(direction) {
+        const currentValue = Number(this.input.value || 0);
+        let nextValue = currentValue + direction;
+
+        if (this.sinCero && nextValue === 0) {
+            nextValue = direction > 0 ? 1 : -1;
         }
 
-        // Si no se permiten negativos, corregimos el valor inicial
-        if (noNegativos) {
-            input.min = "0";
+        this.setValue(nextValue);
+    }
 
-            if (Number(input.value) < 0) {
-                input.value = "0";
-            }
+    handleKeydown(event) {
+        if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+            return;
         }
 
-        // Incrementar
-        inc.addEventListener("click", () => {
-            input.value = Number(input.value || 0) + 1;
-        });
+        event.preventDefault();
+        this.changeBy(event.key === "ArrowUp" ? 1 : -1);
+    }
 
-        // Decrementar
-        dec.addEventListener("click", () => {
+    validateInput() {
+        const value = Number(this.input.value);
 
-            const valorActual = Number(input.value || 0);
+        if (!Number.isFinite(value)) {
+            return;
+        }
 
-            if (noNegativos && valorActual <= 0) {
-                return;
-            }
+        if (this.sinCero && value === 0) {
+            this.setValue(this.lastNonZeroValue > 0 ? -1 : 1);
+            return;
+        }
 
-            input.value = valorActual - 1;
-        });
+        this.setValue(value);
+    }
 
-        // Validación manual
-        input.addEventListener("input", () => {
+    setValue(value) {
+        let validValue = Number.isFinite(value) ? value : 0;
 
-            if (!noNegativos) {
-                return;
-            }
+        if (this.noNegativos && validValue < 0) {
+            validValue = 0;
+        }
 
-            const valor = Number(input.value);
+        if (this.sinCero && validValue === 0) {
+            validValue = 1;
+        }
 
-            if (!isNaN(valor) && valor < 0) {
-                input.value = "0";
-            }
-        });
+        if (validValue !== 0) {
+            this.lastNonZeroValue = validValue;
+        }
+
+        this.input.value = String(validValue);
+        this.setAttribute("value", String(validValue));
     }
 }
 
