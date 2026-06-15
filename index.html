@@ -409,6 +409,64 @@
             margin: 0;
         }
 
+        .component-showcase {
+            padding: clamp(20px, 4vw, 34px);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: var(--surface);
+            box-shadow: 0 12px 35px rgb(94 55 38 / 8%);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 26px;
+        }
+
+        .showcase-group {
+            display: grid;
+            align-content: start;
+            gap: 16px;
+        }
+
+        .showcase-group h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .quantity-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .custom {
+            --card-width: 150px;
+            --card-height: 100px;
+        }
+
+        .wide-card {
+            --card-width: 240px;
+            --card-height: 100px;
+        }
+
+        .mini-card {
+            display: grid;
+            height: 100%;
+            place-items: center;
+            padding: 18px;
+            color: var(--primary-dark);
+            background: var(--surface-soft);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .wide-card .mini-card {
+            color: white;
+            background: linear-gradient(135deg, #27675d, #173f47);
+        }
+
         .detail-layout {
             display: grid;
             grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
@@ -510,7 +568,8 @@
             }
 
             .filter-grid,
-            .menu-grid {
+            .menu-grid,
+            .showcase-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -639,6 +698,46 @@
                 style="--scroll-gap: 20px; --scroll-padding: 10px;"
             ></mi-horizontal-scroll>
             <p class="scroll-hint">Desplaza horizontalmente para ver más.</p>
+        </section>
+
+        <section class="component-showcase" aria-labelledby="variants-title">
+            <div class="section-heading">
+                <div>
+                    <h2 id="variants-title">Variantes de componentes</h2>
+                    <p>
+                        El mismo componente se puede insertar con distintos
+                        atributos, estilos y contenido.
+                    </p>
+                </div>
+            </div>
+
+            <div class="showcase-grid">
+                <div class="showcase-group">
+                    <h3>Campos numericos</h3>
+                    <div class="quantity-row">
+                        <campo-numerico value="2" no-negativos>
+                            Unidades:
+                        </campo-numerico>
+                        <campo-numerico value="-1">
+                            Ajuste:
+                        </campo-numerico>
+                    </div>
+                </div>
+
+                <div class="showcase-group">
+                    <h3>Tarjetas</h3>
+                    <mi-horizontal-scroll
+                        style="--scroll-gap: 12px; --scroll-padding: 6px;"
+                    >
+                        <mi-card class="custom">
+                            <div class="mini-card">Compacta</div>
+                        </mi-card>
+                        <mi-card class="wide-card">
+                            <div class="mini-card">Promocion amplia</div>
+                        </mi-card>
+                    </mi-horizontal-scroll>
+                </div>
+            </div>
         </section>
 
         <section id="menu" aria-labelledby="menu-title">
